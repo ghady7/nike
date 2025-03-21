@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Order</title>
+  <link rel="stylesheet" href="order.css">
+</head>
+<body>
+  <header>
+    <h1>Edit Order</h1>
+  </header>
+  
+  <div class="form-container">
+    <h2>Edit Order Details</h2>
+    <form id="orderForm">
+      <!-- Date input field moved to the first position -->
+      <div class="form-group">
+        <label for="orderDate">Order Date</label>
+        <input type="date" id="orderDate" name="orderDate" required />
+      </div>
+      
+      <div class="form-group">
+        <label for="customerName">Customer Name</label>
+        <input type="text" id="customerName" name="customerName" required />
+      </div>
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input type="text" id="phoneNumber" name="phoneNumber" required />
+      </div>
+      <div class="form-group">
+        <label for="itemNumber">Item Number</label>
+        <input type="text" id="itemNumber" name="itemNumber" required />
+      </div>
+      <div class="form-group">
+        <label for="color">Color</label>
+        <input type="text" id="color" name="color" required />
+      </div>
+      <div class="form-group">
+        <label for="size">Size</label>
+        <input type="text" id="size" name="size" required />
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" id="description" name="description" />
+      </div>
+      <div class="form-group">
+        <label>Branch</label>
+        <div>
+          <input type="radio" id="souks" name="branch" value="Souks" required />
+          <label for="souks">Souks</label>
+        </div>
+        <div>
+          <input type="radio" id="abcVerdun" name="branch" value="ABC Verdun" />
+          <label for="abcVerdun">ABC Verdun</label>
+        </div>
+        <div>
+          <input type="radio" id="abcAsh" name="branch" value="ABC Ash" />
+          <label for="abcAsh">ABC Ash</label>
+        </div>
+        <div>
+          <input type="radio" id="bcc" name="branch" value="BCC" />
+          <label for="bcc">BCC</label>
+        </div>
+        <div>
+          <input type="radio" id="ghazir" name="branch" value="Ghazir" />
+          <label for="ghazir">Ghazir</label>
+        </div>
+        <div>
+          <input type="radio" id="tripoli" name="branch" value="Tripoli" />
+          <label for="tripoli">Tripoli</label>
+        </div>
+        <div>
+          <input type="radio" id="gs" name="branch" value="Gs" />
+          <label for="gs">Gs</label>
+        </div>
+        <div>
+          <input type="radio" id="wh" name="branch" value="WH" />
+          <label for="wh">WH</label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="employee">Employee</label>
+        <input type="text" id="employee" name="employee" required />
+      </div>
+      <div class="form-group">
+        <label for="enteredBy">Entered By</label>
+        <input type="text" id="enteredBy" name="enteredBy" required />
+      </div>
+
+      <button type="submit" id="submitButton">Save Changes</button>
+    </form>
+  </div>
+
+  <script>
+    window.onload = function () {
+      const editIndex = localStorage.getItem("editOrderIndex");
+
+      if (editIndex !== null) {
+        const savedOrders = JSON.parse(localStorage.getItem("orders"));
+        const order = savedOrders[editIndex];
+
+        // Pre-fill the form with the existing order values
+        document.getElementById("customerName").value = order.customerName;
+        document.getElementById("phoneNumber").value = order.phoneNumber;
+        document.getElementById("itemNumber").value = order.itemNumber;
+        document.getElementById("color").value = order.color;
+        document.getElementById("size").value = order.size;
+        document.getElementById("description").value = order.description;
+        document.getElementById("employee").value = order.employee;
+        document.getElementById("enteredBy").value = order.enteredBy;
+        document.getElementById("orderDate").value = order.orderDate;
+
+        // Pre-select the branch radio button
+        document.querySelector(`input[name="branch"][value="${order.branch}"]`).checked = true;
+
+        // On submit, save the updated order to localStorage
+        document.getElementById("submitButton").onclick = function (e) {
+          e.preventDefault(); // Prevent form submission to handle it via JS
+
+          const updatedOrder = {
+            customerName: document.getElementById("customerName").value,
+            phoneNumber: document.getElementById("phoneNumber").value,
+            itemNumber: document.getElementById("itemNumber").value,
+            color: document.getElementById("color").value,
+            size: document.getElementById("size").value,
+            description: document.getElementById("description").value,
+            branch: document.querySelector('input[name="branch"]:checked').value,
+            employee: document.getElementById("employee").value,
+            enteredBy: document.getElementById("enteredBy").value,
+            orderDate: document.getElementById("orderDate").value, // Save the order date
+            status: order.status, // Keep the same status
+          };
+
+          // Save the updated order back into localStorage
+          savedOrders[editIndex] = updatedOrder;
+          localStorage.setItem("orders", JSON.stringify(savedOrders));
+
+          // Clear the editOrderIndex after updating
+          localStorage.removeItem("editOrderIndex");
+
+          // Redirect back to the orders table page
+          window.location.href = "order_table.html";
+        };
+      } else {
+        // Handle the case for adding a new order (if no editIndex is found)
+        document.getElementById("submitButton").onclick = function (e) {
+          e.preventDefault(); // Prevent form submission to handle it via JS
+
+          const newOrder = {
+            customerName: document.getElementById("customerName").value,
+            phoneNumber: document.getElementById("phoneNumber").value,
+            itemNumber: document.getElementById("itemNumber").value,
+            color: document.getElementById("color").value,
+            size: document.getElementById("size").value,
+            description: document.getElementById("description").value,
+            branch: document.querySelector('input[name="branch"]:checked').value,
+            employee: document.getElementById("employee").value,
+            enteredBy: document.getElementById("enteredBy").value,
+            orderDate: document.getElementById("orderDate").value, // Capture the order date
+            status: "Pending", // Default to Pending
+          };
+
+          let savedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+          savedOrders.push(newOrder);
+          localStorage.setItem("orders", JSON.stringify(savedOrders));
+
+          // Redirect back to the orders list page
+          window.location.href = "order_table.html";
+        };
+      }
+    };
+  </script>
+</body>
+</html>

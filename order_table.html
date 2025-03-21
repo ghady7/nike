@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Customer Order</title>
+  <link rel="stylesheet" href="order_table.css">
+</head>
+<body>
+  <header>
+    <h1>Customer Order</h1>
+  </header>
+  <div class="search-container">
+    <div>
+      <label for="search">Search Orders:</label>
+      <input type="text" id="search" onkeyup="searchOrders()" placeholder="Search orders...">
+    </div>
+    <a href="add_order.html" class="add-order-button">Add Order</a>
+  </div>
+
+  <div class="table-container">
+    <h2>Orders List</h2>
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th>Order Date</th>
+          <th>Customer Name</th>
+          <th>Phone Number</th>
+          <th>Item Number</th>
+          <th>Color</th>
+          <th>Size</th>
+          <th>Description</th>
+          <th>Branch</th>
+          <th>Employee</th>
+          <th>Entered By</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="ordersPagination">
+      <button id="prevOrdersBtn" onclick="changeOrdersPage(-1)">Previous</button>
+      <span id="ordersPageNumbers"></span>
+      <button id="nextOrdersBtn" onclick="changeOrdersPage(1)">Next</button>
+    </div>
+  </div>
+
+  <div class="search-container">
+    <div>
+      <label for="arrivalSearch">Search Arrival Table:</label>
+      <input type="text" id="arrivalSearch" onkeyup="searchArrivalTable()" placeholder="Search by Name or Phone Number">
+    </div>
+  </div>
+
+  <div class="table-container">
+    <h2>Phone Numbers, Name & Date of Arrival</h2>
+    <table id="arrivalTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Phone Number</th>
+          <th>Date of Arrival</th>
+          <th>SMS</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div id="arrivalPagination">
+      <button id="prevArrivalBtn" onclick="changeArrivalPage(-1)">Previous</button>
+      <span id="arrivalPageNumbers"></span>
+      <button id="nextArrivalBtn" onclick="changeArrivalPage(1)">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const rowsPerPage = 30;
+    let currentOrdersPage = 1;
+    let currentArrivalPage = 1;
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+    function loadOrders() {
+      const ordersTable = document.getElementById("ordersTable").getElementsByTagName("tbody")[0];
+      ordersTable.innerHTML = '';
+
+      const totalOrdersPages = Math.ceil(orders.length / rowsPerPage);
+      const ordersStartIndex = (currentOrdersPage - 1) * rowsPerPage;
+      const ordersEndIndex = Math.min(ordersStartIndex + rowsPerPage, orders.length);
+
+      for (let i = ordersStartIndex; i < ordersEndIndex; i++) {
+        const order = orders[i];
+        const statusClass = order.status === "Arrived" ? "arrived" : "pending";
+
+        const row = ordersTable.insertRow();
+        row.innerHTML =
+          `<td>${order.orderDate || 'N/A'}</td>
+           <td>${order.customerName || 'N/A'}</td>
+           <td>${order.phoneNumber || 'N/A'}</td>
+           <td>${order.itemNumber || 'N/A'}</td>
+           <td>${order.color || 'N/A'}</td>
+           <td>${order.size || 'N/A'}</td>
+           <td>${order.description || 'N/A'}</td>
+           <td>${order.branch || 'N/A'}</td>
+           <td>${order.employee || 'N/A'}</td>
+           <td>${order.enteredBy || 'N/A'}</td>
+           <td><button class="status-button ${statusClass}" onclick="toggleStatus(this, ${i})">${order.status}</button></td>
+           <td>
+             <button onclick="editOrder(${i})">Edit</button>
+             <button onclick="deleteOrder(${i})">Delete</button>
+           </td>`;
+
+        updateRowColor(row, order);
+      }
+
+      document.getElementById("prevOrdersBtn").disabled = currentOrdersPage === 1;
+      document.getElementById("nextOrdersBtn").disabled = currentOrdersPage === totalOrdersPages;
+
+      const ordersPageNumbers = document.getElementById("ordersPageNumbers");
+      ordersPageNumbers.innerHTML = '';
+      for (let i = 1; i <= totalOrdersPages; i++) {
+        const pageNumberButton = document.createElement("button");
+        pageNumberButton.innerText = i;
+        pageNumberButton.onclick = () => goToOrdersPage(i);
+        if (i === currentOrdersPage) {
+          pageNumberButton.disabled = true;
+        }
+        ordersPageNumbers.appendChild(pageNumberButton);
+      }
+
+      loadArrivalTable();
+    }
+
+    function loadArrivalTable() {
+      const arrivalTable = document.getElementById("arrivalTable").getElementsByTagName("tbody")[0];
+      arrivalTable.innerHTML = '';
+
+      const arrivedOrders = orders.filter(order => order.status === "Arrived").sort((a, b) => new Date(b.arrivalDate) - new Date(a.arrivalDate));
+      const totalArrivalPages = Math.ceil(arrivedOrders.length / rowsPerPage);
+      const arrivalStartIndex = (currentArrivalPage - 1) * rowsPerPage;
+      const arrivalEndIndex = Math.min(arrivalStartIndex + rowsPerPage, arrivedOrders.length);
+
+      for (let i = arrivalStartIndex; i < arrivalEndIndex; i++) {
+        const order = arrivedOrders[i];
+        const arrivalDate = order.arrivalDate || new Date().toLocaleString();
+        if (order.smsSent === undefined) {
+          order.smsSent = false;
+        }
+        const row = arrivalTable.insertRow();
+        row.innerHTML =
+          `<td>${order.customerName || 'N/A'}</td>
+           <td>${order.phoneNumber || 'N/A'}</td>
+           <td contenteditable="true" onblur="updateArrivalDate(${i}, this)">${arrivalDate}</td>
+           <td>
+             <button onclick="sendSms(${i}, this)" style="background-color: ${order.smsSent ? 'green' : 'orange'};">
+               ${order.smsSent ? 'SMS Sent' : 'Send SMS'}
+             </button>
+           </td>`;
+      }
+
+      document.getElementById("prevArrivalBtn").disabled = currentArrivalPage === 1;
+      document.getElementById("nextArrivalBtn").disabled = currentArrivalPage === totalArrivalPages;
+
+      const arrivalPageNumbers = document.getElementById("arrivalPageNumbers");
+      arrivalPageNumbers.innerHTML = '';
+      for (let i = 1; i <= totalArrivalPages; i++) {
+        const pageNumberButton = document.createElement("button");
+        pageNumberButton.innerText = i;
+        pageNumberButton.onclick = () => goToArrivalPage(i);
+        if (i === currentArrivalPage) {
+          pageNumberButton.disabled = true;
+        }
+        arrivalPageNumbers.appendChild(pageNumberButton);
+      }
+    }
+
+    function updateRowColor(row, order) {
+      const statusButton = row.querySelector('.status-button');
+      statusButton.style.backgroundColor = order.status === "Arrived" ? "green" : "blue";
+    }
+
+    function toggleStatus(button, index) {
+      const currentStatus = button.innerText;
+      if (currentStatus === "Pending") {
+        button.innerText = "Arrived";
+        button.style.backgroundColor = "green";
+        orders[index].status = "Arrived";
+        orders[index].arrivalDate = new Date().toLocaleString();
+        if (orders[index].smsSent === undefined) {
+          orders[index].smsSent = false;
+        }
+      } else {
+        button.innerText = "Pending";
+        button.style.backgroundColor = "blue";
+        orders[index].status = "Pending";
+        orders[index].arrivalDate = "";
+      }
+      localStorage.setItem("orders", JSON.stringify(orders));
+      loadOrders();
+    }
+
+    function updateArrivalDate(index, cell) {
+      orders[index].arrivalDate = cell.innerText;
+      localStorage.setItem("orders", JSON.stringify(orders));
+      loadArrivalTable();
+    }
+
+    function sendSms(index, button) {
+      orders[index].smsSent = !orders[index].smsSent;
+      localStorage.setItem("orders", JSON.stringify(orders));
+      if (orders[index].smsSent) {
+        button.innerText = "SMS Sent";
+        button.style.backgroundColor = "green";
+      } else {
+        button.innerText = "Send SMS";
+        button.style.backgroundColor = "orange";
+      }
+    }
+
+    function searchOrders() {
+      const input = document.getElementById("search");
+      const filter = input.value.toLowerCase();
+      const table = document.getElementById("ordersTable").getElementsByTagName("tbody")[0];
+      const rows = table.getElementsByTagName("tr");
+      for (let i = 0; i < rows.length; i++) {
+        const cells = rows[i].getElementsByTagName("td");
+        let match = false;
+        for (let j = 0; j < cells.length; j++) {
+          if (cells[j].innerText.toLowerCase().includes(filter)) {
+            match = true;
+            break;
+          }
+        }
+        rows[i].style.display = match ? "" : "none";
+      }
+    }
+
+    function searchArrivalTable() {
+      const input = document.getElementById("arrivalSearch");
+      const filter = input.value.toLowerCase();
+      const table = document.getElementById("arrivalTable").getElementsByTagName("tbody")[0];
+      const rows = table.getElementsByTagName("tr");
+      for (let i = 0; i < rows.length; i++) {
+        const nameCell = rows[i].cells[0].innerText.toLowerCase();
+        const phoneCell = rows[i].cells[1].innerText.toLowerCase();
+        rows[i].style.display = (nameCell.includes(filter) || phoneCell.includes(filter)) ? "" : "none";
+      }
+    }
+
+    function deleteOrder(index) {
+      if (confirm("Are you sure you want to delete this order?")) {
+        orders.splice(index, 1);
+        localStorage.setItem("orders", JSON.stringify(orders));
+        loadOrders();
+      }
+    }
+
+    function editOrder(index) {
+      localStorage.setItem("editOrderIndex", index);
+      window.location.href = "add_order.html";
+    }
+
+    function changeOrdersPage(direction) {
+      currentOrdersPage += direction;
+      loadOrders();
+    }
+
+    function changeArrivalPage(direction) {
+      currentArrivalPage += direction;
+      loadArrivalTable();
+    }
+
+    function goToOrdersPage(pageNumber) {
+      currentOrdersPage = pageNumber;
+      loadOrders();
+    }
+
+    function goToArrivalPage(pageNumber) {
+      currentArrivalPage = pageNumber;
+      loadArrivalTable();
+    }
+
+    window.onload = loadOrders;
+    
+  </script>
+</body>
+</html>

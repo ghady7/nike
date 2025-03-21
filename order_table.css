@@ -1,0 +1,234 @@
+/* Dark Theme Styles */
+:root {
+  --dark-bg: #0d1117;
+  --dark-secondary: #161b22;
+  --accent-orange: #ff6600;
+  --text-primary: #e6edf3;
+  --text-secondary: #7d8590;
+  --border-color: #30363d;
+  --success-green: #238636;
+  --warning-yellow: #9e6a03;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui;
+  background-color: var(--dark-bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  padding: 2rem;
+}
+
+/* Header Styles */
+header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: var(--accent-orange);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.05em;
+  background: linear-gradient(45deg, #ff6600, #ff8c00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+/* Search and Actions */
+.search-container {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.search-container input {
+  flex: 1;
+  max-width: 400px;
+  padding: 0.75rem 1rem;
+  background: var(--dark-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.search-container input:focus {
+  border-color: var(--accent-orange);
+  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.1);
+}
+
+.add-order-button {
+  background: var(--accent-orange);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: transform 0.2s ease;
+}
+
+.add-order-button:hover {
+  transform: translateY(-1px);
+}
+
+/* Table Styles */
+.table-container {
+  background: var(--dark-secondary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  margin: 2rem 0;
+  overflow: hidden;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+th {
+  background: rgba(255, 102, 0, 0.1);
+  color: var(--accent-orange);
+  font-weight: 600;
+}
+
+td {
+  color: var(--text-secondary);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: rgba(255, 102, 0, 0.05);
+}
+
+/* Status Indicators */
+.status-button {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+  border: none;
+  cursor: default;
+}
+
+.status-button.pending {
+  background: rgba(255, 102, 0, 0.15);
+  color: var(--accent-orange);
+}
+
+.status-button.arrived {
+  background: rgba(35, 134, 54, 0.15);
+  color: var(--success-green);
+}
+
+/* Action Buttons */
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background: var(--dark-secondary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+button[onclick*="delete"] {
+  border-color: #da3633;
+  color: #da3633;
+}
+
+button[onclick*="delete"]:hover {
+  background: rgba(218, 54, 51, 0.1);
+}
+
+/* Pagination */
+#pagination {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+}
+
+#pagination button {
+  min-width: 2.5rem;
+  padding: 0.5rem;
+}
+
+#pagination button.active {
+  background: var(--accent-orange);
+  border-color: var(--accent-orange);
+  color: white;
+}
+
+/* Editable Cells */
+td[contenteditable="true"] {
+  background: rgba(255, 102, 0, 0.05);
+  border-radius: 4px;
+  padding: 0.5rem !important;
+  transition: all 0.2s ease;
+}
+
+td[contenteditable="true"]:focus {
+  outline: 2px solid var(--accent-orange);
+}
+
+/* SMS Status */
+button[onclick*="sendSms"] {
+  min-width: 100px;
+}
+
+button[onclick*="sendSms"][style*="green"] {
+  background: var(--success-green);
+  border-color: var(--success-green);
+  color: white;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  body {
+    padding: 1rem;
+  }
+
+  .table-container {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+
+  table {
+    font-size: 0.9rem;
+  }
+
+  th, td {
+    padding: 0.75rem;
+  }
+}
