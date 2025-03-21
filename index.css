@@ -190,6 +190,7 @@ button {
 
   .table-container {
       padding: 0.5rem;
+       overflow: scroll;
   }
 
   th, td {
