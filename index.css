@@ -1,0 +1,222 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Outfit', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  line-height: 1.6;
+  padding: 1rem;
+}
+
+header {
+  background-color: #333333;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  color: #ff6b00;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.search-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: #262626;
+  border-radius: 8px;
+}
+
+label {
+  color: #ff6b00;
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+input[type="text"] {
+  padding: 0.6rem;
+  border: 2px solid #ff6b00;
+  border-radius: 5px;
+  background-color: #333333;
+  color: #ffffff;
+  width: 100%;
+  max-width: 300px;
+  transition: border-color 0.3s ease;
+}
+
+.add-order-button {
+  background-color: #ff6b00;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.table-container {
+  overflow: hidden;
+  background-color: #262626;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+ 
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  min-width: 800px;
+}
+
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #444444;
+  white-space: nowrap;
+}
+
+th {
+  background-color: #333333;
+  color: #ff6b00;
+  font-weight: bold;
+}
+
+tr:hover {
+  background-color: #333333;
+}
+
+tr:nth-child(even) {
+  background-color: #2d2d2d;
+}
+
+button {
+  background-color: #ff6b00;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 2px;
+}
+
+.status-button {
+  min-width: 80px;
+}
+
+#ordersPagination, #arrivalPagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  header {
+      padding: 1rem;
+  }
+
+  h1 {
+      font-size: 1.5rem;
+  }
+
+  h2 {
+      font-size: 1.2rem;
+  }
+
+  .search-container {
+      flex-direction: column;
+      align-items: stretch;
+  }
+
+  input[type="text"] {
+      max-width: 100%;
+  }
+
+  .add-order-button {
+      width: 100%;
+      padding: 0.8rem;
+  }
+
+  th, td {
+      padding: 8px;
+      font-size: 0.9rem;
+  }
+
+  button {
+      padding: 5px 10px;
+      font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+      padding: 0.5rem;
+  }
+
+  header {
+      padding: 0.8rem;
+      border-radius: 6px;
+  }
+
+  .table-container {
+      padding: 0.5rem;
+  }
+
+  th, td {
+      padding: 6px;
+      font-size: 0.85rem;
+  }
+
+  .status-button {
+      min-width: 70px;
+      padding: 4px 8px;
+  }
+
+  #ordersPagination button, 
+  #arrivalPagination button {
+      padding: 4px 8px;
+  }
+}
+
+/* Status Colors */
+.arrived {
+  background-color: #28a745 !important;
+}
+
+.pending {
+  background-color: #007bff !important;
+}
+
+/* Hover Effects */
+button:hover, .add-order-button:hover {
+  background-color: #ff8c00;
+  transform: translateY(-1px);
+}
+
+input[type="text"]:focus {
+  border-color: #ff8c00;
+  outline: none;
+}
