@@ -72,9 +72,6 @@ input[type="text"] {
   flex-shrink: 0;
 }
 
-.table-container {
- 
-
   .table-container {
     background-color: #262626;
     padding: 1rem;
@@ -85,7 +82,7 @@ input[type="text"] {
   }
   
   /* Remove the ::-webkit-scrollbar styles completely */
-}
+
 .table-container::-webkit-scrollbar {
   display: none;
   width: 0;
