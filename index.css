@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Outfit', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'outfit', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
@@ -73,12 +73,22 @@ input[type="text"] {
 }
 
 .table-container {
-  overflow: hidden;
-  background-color: #262626;
-  padding: 1rem;
-  border-radius: 8px;
-  margin-bottom: 1.5rem;
  
+
+  .table-container {
+    background-color: #262626;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;  /* This enables horizontal scrolling */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+  
+  /* Remove the ::-webkit-scrollbar styles completely */
+}
+.table-container::-webkit-scrollbar {
+  display: none;
+  width: 0;
 }
 
 table {
@@ -220,3 +230,4 @@ input[type="text"]:focus {
   border-color: #ff8c00;
   outline: none;
 }
+
