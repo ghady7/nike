@@ -79,7 +79,7 @@ body {
   .form-group div {
     margin-bottom: 8px; /* Reduced spacing */
     display: flex;
-    align-items: center;
+   
   }
   
   .form-group div label {
@@ -130,16 +130,28 @@ body {
       margin-bottom: 10px;
     }
   }
+  
 
   .fieldset{display: flex;
     justify-content: center;
     flex-direction: column;
     height: 200px;
     flex-wrap: wrap;
+    align-content: space-around;
     border-radius: 8px;
-    border-color:#ff6600;}
-  
+    border-color:#ff6600;
+    padding-top: 10px;
+  }
     /* Add this to your existing CSS */
+
+
+  .branch_div{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    border-radius: 8px;
+    border-color:#ff6600;
+  }
 select {
   width: 100%;
   padding: 8px;
