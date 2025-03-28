@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,100..900&family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">  <title>Customer Order</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  <title>Nike Customer Order</title>
   <link rel="stylesheet" href="index.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
   <header>
@@ -200,24 +200,71 @@
       }
       localStorage.setItem("orders", JSON.stringify(orders));
       loadOrders();
+      exportToExcel(); // Export to Excel after changing status
     }
 
     function updateArrivalDate(index, cell) {
       orders[index].arrivalDate = cell.innerText;
       localStorage.setItem("orders", JSON.stringify(orders));
       loadArrivalTable();
+      exportToExcel(); // Export to Excel after updating arrival date
     }
 
     function sendSms(index, button) {
-      orders[index].smsSent = !orders[index].smsSent;
-      localStorage.setItem("orders", JSON.stringify(orders));
-      if (orders[index].smsSent) {
-        button.innerText = "SMS Sent";
-        button.style.backgroundColor = "green";
-      } else {
-        button.innerText = "Send SMS";
-        button.style.backgroundColor = "orange";
+      const order = orders[index];
+      const phoneNumber = order.phoneNumber;
+      const customerName = order.customerName;
+      const itemNumber = order.itemNumber;
+      const color = order.color;
+
+      if (button.innerText === "SMS Sent") {
+        if (confirm("Do you want to reset the SMS status to 'Send SMS'?")) {
+          button.innerText = "Send SMS";
+          button.style.backgroundColor = "orange";
+          order.smsSent = false;
+          localStorage.setItem("orders", JSON.stringify(orders));
+          exportToExcel(); // Export to Excel after resetting SMS status
+        }
+        return;
       }
+
+      if (!phoneNumber) {
+        alert("No phone number provided.");
+        return;
+      }
+
+      // Remove non-numeric characters
+      let cleanedNumber = phoneNumber.replace(/\D/g, '');
+
+      // Ensure it starts with the correct country code (Lebanon: +961)
+      if (cleanedNumber.startsWith('0')) {
+        cleanedNumber = '961' + cleanedNumber.slice(1); // Remove leading 0 and add 961
+      } else if (!cleanedNumber.startsWith('961')) {
+        cleanedNumber = '961' + cleanedNumber; // Ensure Lebanon's country code is present
+      }
+
+      // Create a Google search link for the item number and color
+      const googleSearchLink = `https://www.google.com/search?q=${encodeURIComponent(itemNumber + " " + color)}`;
+
+      // Encode the message with the customer's name and a clickable link for the item
+      const message = encodeURIComponent(
+        `Dear ${customerName},\n\nYour Nike order has arrived at our ABC Dbayeh branch and is now ready for collection. Please note that orders will be held for 2 days only.\n\nVerify your ordered item here:(${googleSearchLink}).\n\nIf you need any assistance, please feel free to contact us.`
+      );
+
+      // Use 'https://web.whatsapp.com/send' to open WhatsApp Web
+      const whatsappUrl = `https://web.whatsapp.com/send?phone=${cleanedNumber}&text=${message}`;
+
+      // Open WhatsApp Web
+      window.open(whatsappUrl, '_blank');
+
+      // Mark SMS as sent
+      order.smsSent = true;
+      localStorage.setItem("orders", JSON.stringify(orders));
+      exportToExcel(); // Export to Excel after sending SMS
+
+      // Update button UI
+      button.innerText = "SMS Sent";
+      button.style.backgroundColor = "green";
     }
 
     function searchOrders() {
@@ -255,12 +302,13 @@
         orders.splice(index, 1);
         localStorage.setItem("orders", JSON.stringify(orders));
         loadOrders();
+        exportToExcel(); // Export to Excel after deleting an order
       }
     }
 
     function editOrder(index) {
       localStorage.setItem("editOrderIndex", index);
-      window.location.href = "add_order.html";
+      window.location.href = "edit_order.html"; // Redirect to the edit page
     }
 
     function changeOrdersPage(direction) {
@@ -283,7 +331,43 @@
       loadArrivalTable();
     }
 
-    window.onload = loadOrders;
+    function addOrder(order) {
+      orders.push(order);
+      localStorage.setItem("orders", JSON.stringify(orders));
+      loadOrders();
+      exportToExcel(); // Export to Excel after adding an order
+    }
+
+    function exportToExcel() {
+      const worksheet = XLSX.utils.json_to_sheet(orders);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+      XLSX.writeFile(workbook, "Orders.xlsx");
+    }
+
+    window.onload = function() {
+      loadOrders();
+      const addOrderForm = document.getElementById("addOrderForm");
+      if (addOrderForm) {
+        addOrderForm.onsubmit = function(event) {
+          event.preventDefault();
+          const order = {
+            orderDate: document.getElementById("orderDate").value,
+            customerName: document.getElementById("customerName").value,
+            phoneNumber: document.getElementById("phoneNumber").value,
+            itemNumber: document.getElementById("itemNumber").value,
+            color: document.getElementById("color").value,
+            size: document.getElementById("size").value,
+            description: document.getElementById("description").value,
+            branch: document.getElementById("branch").value,
+            employee: document.getElementById("employee").value,
+            enteredBy: document.getElementById("enteredBy").value,
+            status: "Pending"
+          };
+          addOrder(order);
+        };
+      }
+    };
     
   </script>
 </body>
