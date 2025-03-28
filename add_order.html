@@ -8,12 +8,96 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:opsz,wght@10..72,100..900&family=Outfit:wght@100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
-  <title>Nike Order Form - Just Do It</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script> 
+<title>Nike Order Form - Just Do It</title>
   <link rel="stylesheet" href="add_order.css">
+  <style>
+    body {
+      background: #121212; /* Carbon-like dark background */
+      color: #ffffff; /* White text */
+      font-family: 'Poppins', sans-serif;
+    }
+    #confirmationPopup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      background: #1e1e1e; /* Dark background */
+      padding: 30px;
+      border: 2px solid #ff6b00; /* Updated orange color */
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      width: 350px;
+      text-align: center;
+      opacity: 0;
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #confirmationPopup.active {
+      display: block;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    #confirmationPopup.exiting {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+    #confirmationPopup h3 {
+      margin-bottom: 20px;
+      color: #ff6b00; /* Updated orange text */
+      font-size: 18px;
+    }
+    #confirmationPopup p {
+      margin-bottom: 20px;
+      color: #ffffff; /* White text */
+      font-size: 16px;
+    }
+    #confirmationPopup .highlight {
+      color: #ff6b00; /* Updated orange highlight */
+      font-weight: bold;
+    }
+    #confirmButton, #cancelButton {
+      padding: 10px 25px;
+      margin: 5px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #confirmButton {
+      background-color: #ff6b00; /* Updated orange button */
+      color: #ffffff; /* White text */
+    }
+    #cancelButton {
+      background-color: #333333; /* Dark button */
+      color: #ffffff; /* White text */
+    }
+    #blurOverlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(5px); /* Blur effect */
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #blurOverlay.active {
+      display: block;
+      opacity: 1;
+    }
+    #blurOverlay.exiting {
+      opacity: 0;
+    }
+  </style>
 </head>
 <body>
   <header>
-    <h1>Order Form</h1>
+    <h1>Customer Order Form</h1>
   </header>
   
   <div class="form-container">
@@ -45,41 +129,41 @@
       </div>
       <div class="form-group">
         <label for="description">Description</label>
-        <input type="text" id="description" name="description" />
+        <input type="text" id="description" name="description"  required/>
       </div>
     <fieldset class="form-group fieldset" ><legend style="font-size: large;text-align: left;">branch</legend>
         <div style="padding-left: 50px;padding-top:20px;display: inline-block;"><div>
           <input type="radio" id="souks" name="branch" value="Souks" required />
-          <label for="souks">Souks</label>
+          <label for="souks">Nike Souks</label>
         </div>
         <div>
           <input type="radio" id="abcVerdun" name="branch" value="ABC Verdun" />
-          <label for="abcVerdun">ABC Verdun</label>
+          <label for="abcVerdun">Nike ABC Verdun</label>
         </div>
         <div>
           <input type="radio" id="abcAsh" name="branch" value="ABC Ash" />
-          <label for="abcAsh">ABC Ash</label>
+          <label for="abcAsh">Nike ABC Ash</label>
         </div>
         <div>
           <input type="radio" id="bcc" name="branch" value="BCC" />
-          <label for="bcc">BCC</label>
+          <label for="bcc">Nike BCC</label>
         </div>
       </div>
        <div  style="padding-left: 50px;padding-top:20px;display: inline-block;"> <div>
           <input type="radio" id="ghazir" name="branch" value="Ghazir" />
-          <label for="ghazir">Ghazir</label>
+          <label for="ghazir">Nike Ghazir</label>
         </div>
         <div>
           <input type="radio" id="tripoli" name="branch" value="Tripoli" />
-          <label for="tripoli">Tripoli</label>
+          <label for="tripoli">Nike Tripoli</label>
         </div>
         <div>
           <input type="radio" id="gs" name="branch" value="Gs" />
-          <label for="gs">Gs</label>
+          <label for="gs">Nike Gs</label>
         </div>
         <div>
           <input type="radio" id="wh" name="branch" value="WH" />
-          <label for="wh">WH</label>
+          <label for="wh">Warehouse</label>
         </div></div>
       </fieldset>
       <div class="form-group">
@@ -88,64 +172,112 @@
       </div>
       <div class="form-group">
         <label for="enteredBy">Entered By</label>
-        <input type="text" id="enteredBy" name="enteredBy" required />
+        <select id="enteredBy" name="enteredBy" required>
+         
+          <option value="Marc" selected>Marc</option>
+          <option value="Chris" >Chris</option>
+          <option value="Ghady">Ghady</option>
+          <option value="Nijad">Nijad</option>
+          <option value="Maria">Maria</option>
+          <option value="Mary">Mary</option>
+          <option value="Mary">Online</option>
+        </select>
       </div>
 
       <button type="submit" id="submitButton">Submit Order</button>
     </form>
   </div>
 
+  <div id="blurOverlay"></div>
+  <div id="confirmationPopup">
+    <h3>Confirm Order</h3>
+    <p id="orderDetails"></p>
+    <button id="confirmButton">Confirm</button>
+    <button id="cancelButton">Cancel</button>
+  </div>
+
   <script>
     window.onload = function () {
-      document.getElementById("orderDate").value = new Date().toISOString().split('T')[0];
-      
-      const editIndex = localStorage.getItem("editOrderIndex");
-      if (editIndex !== null) {
-        const savedOrders = JSON.parse(localStorage.getItem("orders"));
-        const order = savedOrders[editIndex];
+      // Clear the edit index to ensure the form is always empty
+      localStorage.removeItem("editOrderIndex");
 
-        document.getElementById("customerName").value = order.customerName;
-        document.getElementById("phoneNumber").value = order.phoneNumber;
-        document.getElementById("itemNumber").value = order.itemNumber;
-        document.getElementById("color").value = order.color;
-        document.getElementById("size").value = order.size;
-        document.getElementById("description").value = order.description;
-        document.getElementById("employee").value = order.employee;
-        document.getElementById("enteredBy").value = order.enteredBy;
-        document.querySelector(`input[name="branch"][value="${order.branch}"]`).checked = true;
-        document.getElementById("orderDate").value = order.orderDate;
-      }
+      document.getElementById("orderDate").value = new Date().toISOString().split('T')[0];
 
       document.getElementById("orderForm").addEventListener("submit", function (e) {
         e.preventDefault();
 
-        const newOrder = {
-          customerName: document.getElementById("customerName").value,
-          phoneNumber: document.getElementById("phoneNumber").value,
-          itemNumber: document.getElementById("itemNumber").value,
-          color: document.getElementById("color").value,
-          size: document.getElementById("size").value,
-          description: document.getElementById("description").value,
-          branch: document.querySelector('input[name="branch"]:checked').value,
-          employee: document.getElementById("employee").value,
-          enteredBy: document.getElementById("enteredBy").value,
-          orderDate: document.getElementById("orderDate").value,
-          status: "Pending",
+        const customerName = document.getElementById("customerName").value;
+        const phoneNumber = document.getElementById("phoneNumber").value;
+
+        const orderDetails = `
+          Customer Name: <span class="highlight">${customerName}</span><br>
+          Phone Number: <span class="highlight">${phoneNumber}</span>
+        `;
+
+        document.getElementById("orderDetails").innerHTML = orderDetails;
+        document.getElementById("confirmationPopup").classList.add("active");
+        document.getElementById("blurOverlay").classList.add("active");
+
+        document.getElementById("confirmButton").onclick = function () {
+          const newOrder = {
+            customerName,
+            phoneNumber,
+            itemNumber: document.getElementById("itemNumber").value,
+            color: document.getElementById("color").value,
+            size: document.getElementById("size").value,
+            description: document.getElementById("description").value,
+            branch: document.querySelector('input[name="branch"]:checked').value,
+            employee: document.getElementById("employee").value,
+            enteredBy: document.getElementById("enteredBy").value,
+            orderDate: document.getElementById("orderDate").value,
+            status: "Pending",
+          };
+
+          let savedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+          savedOrders.unshift(newOrder);
+          localStorage.setItem("orders", JSON.stringify(savedOrders));
+          exportToExcel(savedOrders); // Export to Excel after adding the order
+          window.location.href = "index.html";
         };
 
-        let savedOrders = JSON.parse(localStorage.getItem("orders")) || [];
+        document.getElementById("cancelButton").onclick = function () {
+          document.getElementById("confirmationPopup").classList.add("exiting");
+          document.getElementById("blurOverlay").classList.add("exiting");
 
-        if (editIndex !== null) {
-          savedOrders[editIndex] = newOrder;
-          localStorage.removeItem("editOrderIndex");
-        } else {
-          savedOrders.unshift(newOrder); // Add at the beginning
-        }
-
-        localStorage.setItem("orders", JSON.stringify(savedOrders));
-        window.location.href = "index.html";
+          setTimeout(() => {
+            document.getElementById("confirmationPopup").classList.remove("active", "exiting");
+            document.getElementById("blurOverlay").classList.remove("active", "exiting");
+          }, 300); // Match the transition duration
+        };
       });
     };
+
+    function exportToExcel(orders) {
+      const worksheet = XLSX.utils.json_to_sheet(orders);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+      XLSX.writeFile(workbook, "Orders.xlsx");
+    }
+
+   
+
+    document.getElementById("orderForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const order = {
+        orderDate: document.getElementById("orderDate").value,
+        customerName: document.getElementById("customerName").value,
+        phoneNumber: document.getElementById("phoneNumber").value,
+        itemNumber: document.getElementById("itemNumber").value,
+        color: document.getElementById("color").value,
+        size: document.getElementById("size").value,
+        description: document.getElementById("description").value,
+        branch: document.querySelector('input[name="branch"]:checked').value,
+        employee: document.getElementById("employee").value,
+        enteredBy: document.getElementById("enteredBy").value,
+        status: "Pending",
+      };
+      addOrder(order);
+    });
   </script>
 </body>
 </html>
